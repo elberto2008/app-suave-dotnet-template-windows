@@ -9,9 +9,6 @@ open Suave.Successful
 open Suave.Operators
 open Suave.Filters
 open System.Collections.Generic
-open OrderTaking.PlaceOrder.Api
-open Suave.Http
-open Suave
 
 
 [<AutoOpen>]
@@ -43,7 +40,7 @@ module Db =
     let createPerson person = 
         let id = peopleStorage.Values.Count + 1
         let newPerson = {person with Id = id}
-        peopleStorage.Add(id, person)
+        peopleStorage.Add(newPerson.Id, newPerson)
         newPerson
 
 

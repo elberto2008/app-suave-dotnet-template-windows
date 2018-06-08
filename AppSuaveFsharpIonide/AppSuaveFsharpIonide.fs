@@ -1,7 +1,4 @@
 open Suave                 // always open suave
-open Suave.Successful      // for OK-result
-open Suave.Operators
-open Suave.Filters
 open OrderContext.RestApi
 
 
