@@ -17,8 +17,8 @@ open System.Collections.Generic
 module RestFul = 
 
     type RestResource<'a> = {
-        GetAll: unit -> 'a seq
-        Create: 'a -> 'a 
+        GetAll: OrderTaking.PlaceOrder.Api.HttpRequest -> Async<OrderTaking.PlaceOrder.Api.HttpResponse>
+        Create: OrderTaking.PlaceOrder.Api.HttpRequest -> Async<OrderTaking.PlaceOrder.Api.HttpResponse>
     }
 
     type Person = {
@@ -60,18 +60,28 @@ let getResourceFromReq<'a> (req: HttpRequest) =
     let getString rawForm = 
         System.Text.Encoding.UTF8.GetString(rawForm)
     req.rawForm |> getString |> fromJson<'a>
-   
 
+let getLocalRequestFromReq<'a> (req: HttpRequest) = 
+    let getString rawForm = 
+        System.Text.Encoding.UTF8.GetString(rawForm)
+    let requestBody = req.rawForm |> getString 
+    let localRequest = {Action = ""; Uri = ""; Body = requestBody}
+    printfn "HERE from getLocalRequestFromReq localRequest ====== %A" localRequest
+
+    localRequest
+
+
+    
 let rest restResourceName resource = 
     let resourcePath = "/" + restResourceName
-    let getAll = warbler(fun _ ->resource.GetAll () |> JSON)
     path resourcePath >=> choose [
-        Filters.GET >=> getAll
-        Filters.POST >=> request (getResourceFromReq >> resource.Create >> JSON)
+        Filters.POST >=> request (getLocalRequestFromReq >> placeOrderApi >> JSON)
     ]
 
 
-let peopleWebPart = rest "place-order" {
-    GetAll = Db.getPeople
-    Create = Db.createPerson    
+
+
+let placeOrderWebPart = rest "place-order" {
+    GetAll = placeOrderApi
+    Create = placeOrderApi
 }

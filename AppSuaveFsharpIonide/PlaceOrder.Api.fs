@@ -102,6 +102,7 @@ let placeOrderApi : PlaceOrderApi =
 
         // start with a string
         let orderFormJson = request.Body
+        printfn "HERE FROM placeOrder function orderFormJson ====  %A" orderFormJson
         let orderForm = JsonConvert.DeserializeObject<OrderFormDto>(orderFormJson)
         // convert to domain object
         let unvalidatedOrder = orderForm |> OrderFormDto.toUnvalidatedOrder

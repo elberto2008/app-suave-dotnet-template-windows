@@ -5,7 +5,7 @@ open OrderContext.RestApi
 
 
 
-let app = peopleWebPart
+let app = placeOrderWebPart
     
 
 let myServerConfig = { defaultConfig with bindings = [ HttpBinding.createSimple HTTP "127.0.0.1" 8085 ]}
