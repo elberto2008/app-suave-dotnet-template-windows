@@ -13,7 +13,7 @@
     <Compile Include="PlaceOrder.Implementation.fs" />
     <Compile Include="PlaceOrder.Dto.fs" />
     <Compile Include="PlaceOrder.Api.fs" />
-    
+    <Compile Include="OrderContext.ResfulApi.fs" />
     <Compile Include="AppSuaveFsharpIonide.fs" />
   </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
