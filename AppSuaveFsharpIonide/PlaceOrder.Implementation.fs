@@ -1,6 +1,8 @@
 module internal OrderTaking.PlaceOrder.Implementation
 
 open OrderTaking.Common
+open Suave.Sockets
+
 
 // ======================================================
 // This file contains the final implementation for the PlaceOrder workflow
@@ -127,6 +129,8 @@ type CreateEvents =
 // ---------------------------
 
 let toCustomerInfo (unvalidatedCustomerInfo: UnvalidatedCustomerInfo) =
+
+    printfn "IN toCustomerInfo"
     result {
         let! firstName = 
             unvalidatedCustomerInfo.FirstName
@@ -144,6 +148,8 @@ let toCustomerInfo (unvalidatedCustomerInfo: UnvalidatedCustomerInfo) =
             Name = {FirstName=firstName; LastName=lastName}
             EmailAddress = emailAddress
             }
+
+        printfn "IN toCustomerInfo customerInfo = %A" customerInfo
         return customerInfo 
     }
 
@@ -195,9 +201,32 @@ let toCheckedAddress (checkAddress:CheckAddressExists) address =
         )
 
 let toOrderId orderId = 
-    orderId 
-    |> OrderId.create "OrderId"
-    |> Result.mapError ValidationError // convert creation error into ValidationError
+
+    //printfn "-----> In toOrderId == %A" orderId
+
+    let orderIdResp =
+        orderId 
+        |> OrderId.create "OrderId"
+        |> Result.mapError ValidationError// convert creation error into ValidationError
+    
+    //printfn "-----> In orderIdResp == %A" orderIdResp
+
+    orderIdResp
+
+
+
+let toOrderIdText orderId = 
+
+    //printfn "-----> In toOrderIdText == %A" orderId
+
+    let orderIdResp =
+        orderId 
+        |> OrderId.create "OrderId"
+        |> Result.mapError ValidationError// convert creation error into ValidationError
+    
+    //printfn "-----> In orderIdTextResp == %A" orderIdResp
+
+    orderIdResp
 
 /// Helper function for validateOrder   
 let toOrderLineId orderId = 
@@ -249,19 +278,34 @@ let toValidatedOrderLine checkProductExists (unvalidatedOrderLine:UnvalidatedOrd
     }
 
 let validateOrder : ValidateOrder = 
+
     fun checkProductCodeExists checkAddressExists unvalidatedOrder ->
+
+
+        
+        printfn "IN validate order unvalidatedOrder = %A" unvalidatedOrder
+
+
         asyncResult {
+
             let! orderId = 
                 unvalidatedOrder.OrderId 
                 |> toOrderId
                 |> AsyncResult.ofResult
+
+            printfn "orderId = %A" orderId
+
             let! customerInfo = 
-                unvalidatedOrder.CustomerInfo 
+                let unvalidateCustomerInfo = unvalidatedOrder.CustomerInfo 
+                unvalidateCustomerInfo
                 |> toCustomerInfo
                 |> AsyncResult.ofResult
+
             let! checkedShippingAddress = 
+                let unvalidateShippingAddress = unvalidatedOrder.ShippingAddress 
                 unvalidatedOrder.ShippingAddress 
                 |> toCheckedAddress checkAddressExists
+
             let! shippingAddress = 
                 checkedShippingAddress 
                 |> toAddress 
@@ -278,6 +322,7 @@ let validateOrder : ValidateOrder =
                 |> List.map (toValidatedOrderLine checkProductCodeExists) 
                 |> Result.sequence // convert list of Results to a single Result
                 |> AsyncResult.ofResult
+
             let validatedOrder : ValidatedOrder = {
                 OrderId  = orderId 
                 CustomerInfo = customerInfo 
@@ -285,8 +330,13 @@ let validateOrder : ValidateOrder =
                 BillingAddress = billingAddress  
                 Lines = lines 
             }
+
+
+
+
             return validatedOrder 
-        }
+        } 
+       
 
 // ---------------------------
 // PriceOrder step
@@ -418,18 +468,26 @@ let placeOrder
     sendOrderAcknowledgment // dependency
     : PlaceOrder =       // definition of function
 
+
     fun unvalidatedOrder -> 
+
+
+
         asyncResult {
             let! validatedOrder = 
                 validateOrder checkProductExists checkAddressExists unvalidatedOrder 
                 |> AsyncResult.mapError PlaceOrderError.Validation
+
+            printfn "HERE MY validatedOrder %A" validatedOrder
+
             let! pricedOrder = 
-                priceOrder getProductPrice validatedOrder 
+                priceOrder getProductPrice validatedOrder               
                 |> AsyncResult.ofResult
                 |> AsyncResult.mapError PlaceOrderError.Pricing
             let acknowledgementOption = 
                 acknowledgeOrder createOrderAcknowledgmentLetter sendOrderAcknowledgment pricedOrder 
             let events = 
                 createEvents pricedOrder acknowledgementOption 
+
             return events
         }

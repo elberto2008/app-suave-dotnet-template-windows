@@ -11,8 +11,10 @@
 
     <Compile Include="PlaceOrder.PublicTypes.fs" />
     <Compile Include="PlaceOrder.Implementation.fs" />
+    <Compile Include="PlaceOrder.ImplementationWithoutEffects.fs" />
     <Compile Include="PlaceOrder.Dto.fs" />
     <Compile Include="PlaceOrder.Api.fs" />
+    <Compile Include="PlaceOrder.WithoutEffects.Api.fs" />
     <Compile Include="OrderContext.ResfulApi.fs" />
     <Compile Include="AppSuaveFsharpIonide.fs" />
   </ItemGroup>

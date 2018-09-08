@@ -10,6 +10,13 @@ open System
 // E.g. Single case discriminated unions (aka wrappers), enums, etc
 // ===============================
 
+//PART I - STATIC TYPES 
+//PART I - STATIC TYPES 
+//PART I - STATIC TYPES 
+//PART I - STATIC TYPES 
+//PART I - STATIC TYPES 
+//PART I - STATIC TYPES 
+
 /// Constrained to be 50 chars or less, not null
 type String50 = private String50 of string
 
@@ -70,6 +77,7 @@ module ConstrainedType =
     /// Create a constrained string using the constructor provided
     /// Return Error if input is null, empty, or length > maxLen
     let createString fieldName ctor maxLen str = 
+        
         if String.IsNullOrEmpty(str) then
             let msg = sprintf "%s must not be null or empty" fieldName 
             Error msg
@@ -77,7 +85,8 @@ module ConstrainedType =
             let msg = sprintf "%s must not be more than %i chars" fieldName maxLen 
             Error msg 
         else
-            Ok (ctor str)
+            let ok = Ok (ctor str)
+            ok
 
     /// Create a optional constrained string using the constructor provided
     /// Return None if input is null, empty. 
@@ -326,3 +335,25 @@ module BillingAmount =
     let sumPrices prices =
         let total = prices |> List.map Price.value |> List.sum
         create total 
+
+////FELIX 
+//PART II - FUNCTION TYPES 
+//PART II - FUNCTION TYPES 
+//PART II - FUNCTION TYPES 
+//PART II - FUNCTION TYPES 
+//PART II - FUNCTION TYPES 
+//PART II - FUNCTION TYPES 
+
+[<AutoOpen>]
+module GlobalFuntionsTypes =
+
+    /// Log the  message to the console
+    
+    let private markBeginingMessageString =  "*** START MESSAGE ***"
+    let private markEndMessageString =  "*** END MESSAGE ***"
+
+    // Return the message to print formated with A SART end END  messages
+
+    let logMessageToConsole  info msgTolog  = 
+        printfn "%A" (String.Concat(markBeginingMessageString, info, msgTolog, markEndMessageString))
+

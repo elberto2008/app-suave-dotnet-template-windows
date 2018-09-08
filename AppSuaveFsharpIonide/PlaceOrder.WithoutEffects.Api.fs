@@ -1,4 +1,4 @@
-module OrderTaking.PlaceOrder.Api
+module OrderTaking.PlaceOrder.WithoutEffects.Api
 
 // ======================================================
 // This file contains the JSON API interface to the PlaceOrder workflow
@@ -39,28 +39,28 @@ type PlaceOrderApi = HttpRequest -> Async<HttpResponse>
 
 // setup dummy dependencies            
 
-let checkProductExists : Implementation.CheckProductCodeExists =
+let checkProductExists : ImplementationWithoutEffects.CheckProductCodeExists =
     fun productCode -> 
         true // dummy implementation
 
-let checkAddressExists : Implementation.CheckAddressExists =
+let checkAddressExists : ImplementationWithoutEffects.CheckAddressExists =
     fun unvalidatedAddress -> 
-        let checkedAddress = Implementation.CheckedAddress unvalidatedAddress 
-        AsyncResult.retn checkedAddress 
+        let checkedAddress = ImplementationWithoutEffects.CheckedAddress unvalidatedAddress 
+        checkedAddress 
 
-let getProductPrice : Implementation.GetProductPrice =
+let getProductPrice : ImplementationWithoutEffects.GetProductPrice =
     fun productCode -> 
         Price.unsafeCreate 1M  // dummy implementation
 
 
-let createOrderAcknowledgmentLetter : Implementation.CreateOrderAcknowledgmentLetter =
+let createOrderAcknowledgmentLetter : ImplementationWithoutEffects.CreateOrderAcknowledgmentLetter =
     fun pricedOrder ->
-        let letterTest = Implementation.HtmlString "some text"
+        let letterTest = ImplementationWithoutEffects.HtmlString "some text"
         letterTest 
 
-let sendOrderAcknowledgment : Implementation.SendOrderAcknowledgment =
+let sendOrderAcknowledgment : ImplementationWithoutEffects.SendOrderAcknowledgment =
     fun orderAcknowledgement ->
-        Implementation.Sent 
+        ImplementationWithoutEffects.Sent 
 
 
 // -------------------------------
@@ -69,13 +69,10 @@ let sendOrderAcknowledgment : Implementation.SendOrderAcknowledgment =
 
 /// This function converts the workflow output into a HttpResponse
 let workflowResultToHttpReponse result = 
-    match result with
-    | Ok events ->
 
-        printfn "EVENT %A" events
         // turn domain events into dtos
         let dtos = 
-            events 
+            result 
             |> List.map PlaceOrderEventDto.fromDomain
             |> List.toArray // arrays are json friendly
         // and serialize to JSON
@@ -86,22 +83,8 @@ let workflowResultToHttpReponse result =
             Body = json
             }
         response
-    | Error err -> 
 
-        printfn "ERROR %A" err
-
-        // turn domain errors into a dto
-        let dto = err |> PlaceOrderErrorDto.fromDomain
-        // and serialize to JSON
-        let json = JsonConvert.SerializeObject(dto )
-        let response = 
-            {
-            HttpStatusCode = 401
-            Body = json
-            }
-        response
-
-let placeOrderApi : PlaceOrderApi =
+let placeOrderApiWithoutEffect : PlaceOrderApi =
     fun request ->
         // following the approach in "A Complete Serialization Pipeline" in chapter 11
 
@@ -115,7 +98,7 @@ let placeOrderApi : PlaceOrderApi =
 
         // setup the dependencies. See "Injecting Dependencies" in chapter 9
         let workflow = 
-            Implementation.placeOrder 
+            ImplementationWithoutEffects.placeOrder 
                 checkProductExists // dependency
                 checkAddressExists // dependency
                 getProductPrice    // dependency
@@ -125,7 +108,11 @@ let placeOrderApi : PlaceOrderApi =
         // now we are in the pure domain
         let asyncResult = workflow unvalidatedOrder 
 
+        //printfn "HERE " asyncResult.
+        
+
 
         // now convert from the pure domain back to a HttpResponse
-        asyncResult 
-        |> Async.map (workflowResultToHttpReponse)
+        let result = asyncResult |> workflowResultToHttpReponse
+
+        result |> Async.retn

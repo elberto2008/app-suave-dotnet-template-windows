@@ -278,7 +278,9 @@ module Async =
 
     /// Lift a value to Async
     let retn x = 
-        async.Return x
+        let p = async.Return x
+        printfn "IN retn p = %A" p
+        p
 
     /// Apply an Async function to an Async value 
     let apply fA xA = 
@@ -390,7 +392,10 @@ module AsyncResult =
 
     /// Lift a Result into an AsyncResult
     let ofResult x : AsyncResult<_,_> = 
-        x |> Async.retn
+        printfn "IN ofResult and X = %A" x
+        let t = x |> Async.retn
+        printfn "IN ofResult and t = %A" tanh
+        t
 
     /// Lift a Async into an AsyncResult
     let ofAsync x : AsyncResult<_,_> = 

@@ -12,8 +12,6 @@ open System.Collections.Generic
 
 
 [<AutoOpen>]
-
-
 module RestFul = 
 
     type RestResource<'a> = {
@@ -66,8 +64,6 @@ let getLocalRequestFromReq<'a> (req: HttpRequest) =
         System.Text.Encoding.UTF8.GetString(rawForm)
     let requestBody = req.rawForm |> getString 
     let localRequest = {Action = ""; Uri = ""; Body = requestBody}
-    printfn "HERE from getLocalRequestFromReq localRequest ====== %A" localRequest
-
     localRequest
 
 
