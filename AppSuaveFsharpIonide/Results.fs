@@ -391,9 +391,9 @@ module AsyncResult =
         x |> Result.Error |> Async.retn 
 
     /// Lift a Result into an AsyncResult
-    let ofResult x : AsyncResult<_,_> = 
+    let ofResult (x:Result<_,_>) : AsyncResult<_,_> = 
         printfn "IN ofResult and X = %A" x
-        let t = x |> Async.retn
+        let t = x |> async.Return
         printfn "IN ofResult and t = %A" tanh
         t
 

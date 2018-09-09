@@ -289,11 +289,13 @@ let validateOrder : ValidateOrder =
         asyncResult {
 
             let! orderId = 
-                unvalidatedOrder.OrderId 
-                |> toOrderId
-                |> AsyncResult.ofResult
+                let testToOrderId = unvalidatedOrder.OrderId |> toOrderId
+                printfn "testToOrderId = %A" testToOrderId
+                let asyncResult: AsyncResult<_,_> = testToOrderId |> AsyncResult.ofResult
+                asyncResult
 
             printfn "orderId = %A" orderId
+            printfn "Before applying Horace Gonzales suggestion"
 
             let! customerInfo = 
                 let unvalidateCustomerInfo = unvalidatedOrder.CustomerInfo 
@@ -336,7 +338,7 @@ let validateOrder : ValidateOrder =
 
             return validatedOrder 
         } 
-       
+        
 
 // ---------------------------
 // PriceOrder step
