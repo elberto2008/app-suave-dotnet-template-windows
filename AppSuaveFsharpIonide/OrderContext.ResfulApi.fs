@@ -67,13 +67,24 @@ let getLocalRequestFromReq<'a> (req: HttpRequest) =
     localRequest
 
 
+
+// our very own WebPart!
+let handlePlaceOrderRequest ctx = 
+    async { 
+        // parse the incoming Suave HttpRequest
+        let lreq = getLocalRequestFromReq ctx.request 
+        // execute placeOrderApi
+        let! res = placeOrderApi lreq 
+        // pass the result of the computation into the JSON webpart and return
+        return! ctx |> JSON res
+    }
     
 let rest restResourceName resource = 
     let resourcePath = "/" + restResourceName
     path resourcePath >=> choose [
-        Filters.POST >=> request (getLocalRequestFromReq >> placeOrderApi >> JSON)
+        Filters.POST >=> handlePlaceOrderRequest 
     ]
-
+    
 
 
 
