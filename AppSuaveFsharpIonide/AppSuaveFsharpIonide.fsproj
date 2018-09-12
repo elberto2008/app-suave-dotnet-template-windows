@@ -18,5 +18,8 @@
     <Compile Include="OrderContext.ResfulApi.fs" />
     <Compile Include="AppSuaveFsharpIonide.fs" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="MySql.Data" Version="6.10.7" />
+  </ItemGroup>
   <Import Project="..\.paket\Paket.Restore.targets" />
 </Project>

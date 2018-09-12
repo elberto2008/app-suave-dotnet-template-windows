@@ -479,9 +479,6 @@ let placeOrder
             let! validatedOrder = 
                 validateOrder checkProductExists checkAddressExists unvalidatedOrder 
                 |> AsyncResult.mapError PlaceOrderError.Validation
-
-            printfn "HERE MY validatedOrder %A" validatedOrder
-
             let! pricedOrder = 
                 priceOrder getProductPrice validatedOrder               
                 |> AsyncResult.ofResult

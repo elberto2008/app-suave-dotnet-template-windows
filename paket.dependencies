@@ -2,7 +2,9 @@ source https://www.nuget.org/api/v2
 
 //framework: >= net461
 nuget FSharp.Core
+nuget MySql.Data 6.10.8
 nuget Newtonsoft.Json
+nuget SQLProvider
 nuget Suave
 
 group Build
