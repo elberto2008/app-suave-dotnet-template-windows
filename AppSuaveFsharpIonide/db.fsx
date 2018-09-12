@@ -28,22 +28,8 @@ let ctx = DbProvider.GetDataContext()
 
 let customers = ctx.Test.Customer
 
-(* let customers = 
-    ctx.Test.Customer 
-    |> Seq.map (fun e -> e.ColumnValues |> Seq.toList)
-    |> Seq.toList
-
-printfn "Customers = %A" customers
-
-
-let customers2 = 
-    query {
-        for customer in ctx.Test.Customer do
-        where (1 = 1)
-        select (customer)
-    } |> Seq.head
- *)
 type Customer = {
+    CustomerId : string
     Name : string
     BirthDate : string
 }
@@ -60,6 +46,7 @@ printfn "CUSTOMERS = %A " allCustomers
 
 let row = customers.Create()
 
+row.CustomerId <- System.Guid.NewGuid().ToString().ToUpper()
 row.Name <- "Megan FOTIO HESS"
 row.Birthdate <- "13/02/1990"
 
