@@ -3,3 +3,6 @@ Suave
 Newtonsoft.Json
 SQLProvider
 MySql.Data
+MongoDB.Driver
+MongoDB.Driver.Core
+MongoDB.Bson

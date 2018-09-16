@@ -60,6 +60,8 @@ let readOneCustomer (connectionString:string) customerId : Result<Customer, DbRe
 
     let ctx = DbProvider.GetDataContext connectionString
 
+   
+
     let dbCustomers = query { 
                                 for nextCustomer in ctx.Test.Customer do
                                 where (nextCustomer.CustomerId = customerId)
